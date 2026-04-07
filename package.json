@@ -1,7 +1,7 @@
 {
-    "name": "obsidian-livesync",
+    "name": "obsidian-datamanagement",
     "version": "0.25.57",
-    "description": "Reflect your vault changes to some other devices immediately. Please make sure to disable other synchronize solutions to avoid content corruption or duplication.",
+    "description": "Data Management made easy.",
     "main": "main.js",
     "type": "module",
     "scripts": {
