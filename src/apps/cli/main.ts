@@ -283,6 +283,7 @@ export async function main() {
 
     // Setup settings handlers
     const settingService = serviceHubInstance.setting;
+    let isGloballyObfuscated = false;
 
     (settingService as InjectableSettingService<NodeServiceContext>).saveData.setHandler(
         async (data: ObsidianLiveSyncSettings) => {
@@ -292,6 +293,7 @@ export async function main() {
                     _obf_data: obfString
                 };
                 await fs.writeFile(settingsPath, JSON.stringify(obfuscatedData, null, 2), "utf-8");
+                isGloballyObfuscated = true;
                 if (options.verbose) {
                     console.error(`[Settings] Saved to ${settingsPath} (obfuscated)`);
                 }
@@ -314,8 +316,10 @@ export async function main() {
                         try {
                             const decrypted = decodeURIComponent(Buffer.from(obfData.slice(5).split("").reverse().join(""), "base64").toString("utf-8"));
                             data = JSON.parse(decrypted);
+                            isGloballyObfuscated = true;
                         } catch (ex) {
                             console.error("Failed to decrypt obfuscated data.json");
+                            isGloballyObfuscated = false;
                         }
                     }
                 } else if (typeof data === "object" && "obfuscated" in data && typeof data.obfuscated === "string") {
@@ -323,9 +327,13 @@ export async function main() {
                     try {
                         const decrypted = decodeURIComponent(Buffer.from(data.obfuscated, "base64").toString("utf-8"));
                         data = JSON.parse(decrypted);
+                        isGloballyObfuscated = false;
                     } catch (ex) {
                         console.error("Failed to decrypt legacy obfuscated data.json");
+                        isGloballyObfuscated = false;
                     }
+                } else {
+                    isGloballyObfuscated = false;
                 }
                 
                 if (options.verbose) {
@@ -394,6 +402,15 @@ export async function main() {
             console.error(`[Error] Failed to initialize LiveSync`);
             process.exit(1);
         }
+
+        // Migrate settings to global obfuscation if necessary
+        if (!isGloballyObfuscated && core.services.setting.settings && Object.keys(core.services.setting.settings).length > 0) {
+            if (options.verbose) {
+                console.error(`[Settings] Migrating to global obfuscation...`);
+            }
+            await core.services.setting.saveSettingData();
+        }
+
         await core.services.setting.suspendAllSync();
         await core.services.control.onReady();
 

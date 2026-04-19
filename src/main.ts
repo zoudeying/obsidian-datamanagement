@@ -16,6 +16,7 @@ import { ModuleReplicateTest } from "./modules/extras/ModuleReplicateTest.ts";
 import { LocalDatabaseMaintenance } from "./features/LocalDatabaseMainte/CmdLocalDatabaseMainte.ts";
 import type { InjectableServiceHub } from "@lib/services/implements/injectable/InjectableServiceHub.ts";
 import { ObsidianServiceHub } from "./modules/services/ObsidianServiceHub.ts";
+import { ObsidianSettingService } from "./modules/services/ObsidianSettingService.ts";
 import { ServiceRebuilder } from "@lib/serviceModules/Rebuilder.ts";
 import { ServiceDatabaseFileAccess } from "@/serviceModules/DatabaseFileAccess.ts";
 import { ServiceFileAccessObsidian } from "@/serviceModules/ServiceFileAccessImpl.ts";
@@ -200,6 +201,12 @@ export default class ObsidianLiveSyncPlugin extends Plugin {
         if (!(await this.core.services.control.onLoad())) return;
         const onReady = this.core.services.control.onReady.bind(this.core.services.control);
         this.app.workspace.onLayoutReady(onReady);
+
+        // Migrate settings to global obfuscation if necessary
+        const settingService = this.core.services.setting;
+        if (settingService instanceof ObsidianSettingService) {
+            await settingService.migrateIfNecessary();
+        }
     }
     override onload() {
         void this._startUp();
