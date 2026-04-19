@@ -77,8 +77,12 @@ class LiveSyncWebApp {
 
         settingService.saveData.setHandler(async (data: ObsidianLiveSyncSettings) => {
             try {
-                await this.saveSettingsToFile(data);
-                console.log("[Settings] Saved to .livesync/settings.json");
+                const obfuscatedData = {
+                    obfuscated: window.btoa(encodeURIComponent(JSON.stringify(data)))
+                };
+                // We'll store it as is, the storage method will handle the writing
+                await this.saveSettingsToFile(obfuscatedData as any);
+                console.log("[Settings] Saved to .livesync/settings.json (obfuscated)");
             } catch (error) {
                 console.error("[Settings] Failed to save:", error);
             }
@@ -86,8 +90,16 @@ class LiveSyncWebApp {
 
         settingService.loadData.setHandler(async (): Promise<ObsidianLiveSyncSettings | undefined> => {
             try {
-                const data = await this.loadSettingsFromFile();
+                let data = await this.loadSettingsFromFile();
                 if (data) {
+                    if (typeof data === "object" && "obfuscated" in data && typeof data.obfuscated === "string") {
+                        try {
+                            const decrypted = decodeURIComponent(window.atob(data.obfuscated));
+                            data = JSON.parse(decrypted);
+                        } catch (ex) {
+                            console.error("Failed to decrypt obfuscated settings, trying to load as plain JSON");
+                        }
+                    }
                     console.log("[Settings] Loaded from .livesync/settings.json");
                     return { ...DEFAULT_SETTINGS, ...data } as ObsidianLiveSyncSettings;
                 }
