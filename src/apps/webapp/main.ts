@@ -76,8 +76,9 @@ class LiveSyncWebApp {
 
         settingService.saveData.setHandler(async (data: ObsidianLiveSyncSettings) => {
             try {
+                const obfString = "_obf_" + window.btoa(encodeURIComponent(JSON.stringify(data))).split("").reverse().join("");
                 const obfuscatedData = {
-                    obfuscated: window.btoa(encodeURIComponent(JSON.stringify(data)))
+                    _obf_data: obfString
                 };
                 // We'll store it as is, the storage method will handle the writing
                 await this.saveSettingsToFile(obfuscatedData as any);
@@ -91,14 +92,27 @@ class LiveSyncWebApp {
             try {
                 let data = await this.loadSettingsFromFile();
                 if (data) {
-                    if (typeof data === "object" && "obfuscated" in data && typeof data.obfuscated === "string") {
+                    // New format: { _obf_data: "_obf_..." }
+                    if (typeof data === "object" && "_obf_data" in data && typeof data._obf_data === "string") {
+                        const obfData = data._obf_data;
+                        if (obfData.startsWith("_obf_")) {
+                            try {
+                                const decrypted = decodeURIComponent(window.atob(obfData.slice(5).split("").reverse().join("")));
+                                data = JSON.parse(decrypted);
+                            } catch (ex) {
+                                console.error("Failed to decrypt obfuscated settings");
+                            }
+                        }
+                    } else if (typeof data === "object" && "obfuscated" in data && typeof data.obfuscated === "string") {
+                        // Legacy format: { obfuscated: "..." }
                         try {
                             const decrypted = decodeURIComponent(window.atob(data.obfuscated));
                             data = JSON.parse(decrypted);
                         } catch (ex) {
-                            console.error("Failed to decrypt obfuscated settings, trying to load as plain JSON");
+                            console.error("Failed to decrypt legacy obfuscated settings");
                         }
                     }
+
                     console.log("[Settings] Loaded from .livesync/settings.json");
                     return { ...DEFAULT_SETTINGS, ...data } as ObsidianLiveSyncSettings;
                 }
