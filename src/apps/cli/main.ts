@@ -396,7 +396,10 @@ export async function main() {
     (settingService as InjectableSettingService<NodeServiceContext>).saveData.setHandler(
         async (data: ObsidianLiveSyncSettings) => {
             try {
-                await fs.writeFile(settingsPath, JSON.stringify(data, null, 2), "utf-8");
+                const obfuscatedData = {
+                    obfuscated: Buffer.from(encodeURIComponent(JSON.stringify(data))).toString("base64")
+                };
+                await fs.writeFile(settingsPath, JSON.stringify(obfuscatedData, null, 2), "utf-8");
                 if (options.verbose) {
                     console.error(`[Settings] Saved to ${settingsPath}`);
                 }
@@ -410,7 +413,15 @@ export async function main() {
         async (): Promise<ObsidianLiveSyncSettings | undefined> => {
             try {
                 const content = await fs.readFile(settingsPath, "utf-8");
-                const data = JSON.parse(content);
+                let data = JSON.parse(content);
+                if (typeof data === "object" && "obfuscated" in data && typeof data.obfuscated === "string") {
+                    try {
+                        const decrypted = decodeURIComponent(Buffer.from(data.obfuscated, "base64").toString("utf-8"));
+                        data = JSON.parse(decrypted);
+                    } catch (ex) {
+                        console.error("Failed to decrypt obfuscated data.json, trying to load as plain JSON");
+                    }
+                }
                 if (options.verbose) {
                     console.error(`[Settings] Loaded from ${settingsPath}`);
                 }

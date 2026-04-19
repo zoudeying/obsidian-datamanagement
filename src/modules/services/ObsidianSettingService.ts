@@ -31,9 +31,22 @@ export class ObsidianSettingService<T extends ObsidianServiceContext> extends Se
     }
 
     protected override async saveData(data: ObsidianLiveSyncSettings): Promise<void> {
-        return await this.context.liveSyncPlugin.saveData(data);
+        const obfuscatedData = {
+            obfuscated: window.btoa(encodeURIComponent(JSON.stringify(data)))
+        };
+        return await this.context.liveSyncPlugin.saveData(obfuscatedData);
     }
     protected override async loadData(): Promise<ObsidianLiveSyncSettings | undefined> {
-        return await this.context.liveSyncPlugin.loadData();
+        const rawData = await this.context.liveSyncPlugin.loadData();
+        if (!rawData) return undefined;
+        if (typeof rawData === "object" && "obfuscated" in rawData && typeof rawData.obfuscated === "string") {
+            try {
+                const decrypted = decodeURIComponent(window.atob(rawData.obfuscated));
+                return JSON.parse(decrypted);
+            } catch (ex) {
+                console.error("Failed to decrypt obfuscated data.json, trying to load as plain JSON");
+            }
+        }
+        return rawData as ObsidianLiveSyncSettings;
     }
 }
