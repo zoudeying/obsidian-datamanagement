@@ -6,6 +6,8 @@ import { SettingService, type SettingServiceDependencies } from "@lib/services/b
 import type { ObsidianServiceContext } from "@lib/services/implements/obsidian/ObsidianServiceContext";
 
 export class ObsidianSettingService<T extends ObsidianServiceContext> extends SettingService<T> {
+    private isGloballyObfuscated = false;
+
     constructor(context: T, dependencies: SettingServiceDependencies) {
         super(context, dependencies);
         this.onSettingSaved.addHandler((settings) => {
@@ -32,8 +34,10 @@ export class ObsidianSettingService<T extends ObsidianServiceContext> extends Se
 
     protected override async saveData(data: ObsidianLiveSyncSettings): Promise<void> {
         const obfData = "_obf_" + window.btoa(encodeURIComponent(JSON.stringify(data))).split("").reverse().join("");
+        this.isGloballyObfuscated = true;
         return await this.context.liveSyncPlugin.saveData({ _obf_data: obfData });
     }
+
     protected override async loadData(): Promise<ObsidianLiveSyncSettings | undefined> {
         const rawData = await this.context.liveSyncPlugin.loadData();
         if (!rawData) return undefined;
@@ -44,6 +48,7 @@ export class ObsidianSettingService<T extends ObsidianServiceContext> extends Se
             if (obfData.startsWith("_obf_")) {
                 try {
                     const decrypted = decodeURIComponent(window.atob(obfData.slice(5).split("").reverse().join("")));
+                    this.isGloballyObfuscated = true;
                     return JSON.parse(decrypted);
                 } catch (ex) {
                     console.error("Failed to decrypt obfuscated data.json");
@@ -55,15 +60,22 @@ export class ObsidianSettingService<T extends ObsidianServiceContext> extends Se
         if (typeof rawData === "object" && "obfuscated" in rawData && typeof rawData.obfuscated === "string") {
             try {
                 const decrypted = decodeURIComponent(window.atob(rawData.obfuscated));
-                const data = JSON.parse(decrypted);
-                // Migrate to new format on next save
-                return data;
+                this.isGloballyObfuscated = false; // Mark for migration
+                return JSON.parse(decrypted);
             } catch (ex) {
                 console.error("Failed to decrypt legacy obfuscated data.json");
             }
         }
 
         // Plain format or fallback
+        this.isGloballyObfuscated = false; // Mark for migration
         return rawData as ObsidianLiveSyncSettings;
+    }
+
+    public async migrateIfNecessary() {
+        if (!this.isGloballyObfuscated && this.settings && Object.keys(this.settings).length > 0) {
+            console.log("Migrating data.json to global obfuscation format...");
+            await this.saveSettingData();
+        }
     }
 }
