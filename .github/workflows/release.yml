@@ -50,7 +50,7 @@ jobs:
           PRERELEASE="${{ inputs.prerelease }}"
         else
           TAG="${GITHUB_REF_NAME}"
-          DRAFT="true"
+          DRAFT="false"
           PRERELEASE="false"
         fi
         echo "tag=${TAG}" >> $GITHUB_OUTPUT
