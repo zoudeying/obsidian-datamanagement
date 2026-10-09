@@ -41,7 +41,7 @@ EOF
 #   mc admin user svcacct info myminio '$accessKey'
 # "
 
-docker run --rm --network host -v /tmp/mybucket-rw.json:/tmp/mybucket-rw.json --entrypoint=/bin/sh minio/mc -c "
+docker run --rm --network host -v /tmp/mybucket-rw.json:/tmp/mybucket-rw.json --entrypoint=/bin/sh minio/mc:RELEASE.2024-01-18T16-56-07Z -c "
   mc alias set myminio $minioEndpoint $accessKey $secretKey 
   mc mb --ignore-existing myminio/$bucketName
 "

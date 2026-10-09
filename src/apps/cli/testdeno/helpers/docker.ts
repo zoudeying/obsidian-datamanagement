@@ -327,8 +327,8 @@ const COUCHDB_CONTAINER = "couchdb-test";
 const COUCHDB_IMAGE = "couchdb:3.5.0";
 
 const MINIO_CONTAINER = "minio-test";
-const MINIO_IMAGE = "minio/minio";
-const MINIO_MC_IMAGE = "minio/mc";
+const MINIO_IMAGE = "minio/minio:RELEASE.2024-01-18T22-51-28Z";
+const MINIO_MC_IMAGE = "minio/mc:RELEASE.2024-01-18T16-56-07Z";
 
 export async function stopCouchdb(): Promise<void> {
     await stopAndRemoveContainer(COUCHDB_CONTAINER);
@@ -521,12 +521,11 @@ export async function startMinio(
     await stopMinio().catch(() => {});
 
     console.log("[INFO] starting MinIO test container");
-    await dockerOrFail(
+    const minioArgs = [
         "run",
         "-d",
         "--name",
         MINIO_CONTAINER,
-        // TODO: Ports should be configurable.
         "-p",
         "9000:9000",
         "-p",
@@ -535,14 +534,12 @@ export async function startMinio(
         `MINIO_ROOT_USER=${accessKey}`,
         "-e",
         `MINIO_ROOT_PASSWORD=${secretKey}`,
-        "-e",
-        `MINIO_SERVER_URL=${minioEndpoint}`,
-        MINIO_IMAGE,
-        "server",
-        "/data",
-        "--console-address",
-        ":9001"
-    );
+    ];
+    if (minioEndpoint && !minioEndpoint.includes("127.0.0.1") && !minioEndpoint.includes("localhost")) {
+        minioArgs.push("-e", `MINIO_SERVER_URL=${minioEndpoint}`);
+    }
+    minioArgs.push(MINIO_IMAGE, "server", "/data", "--console-address", ":9001");
+    await dockerOrFail(...minioArgs);
     trackContainer(MINIO_CONTAINER);
 
     console.log(`[INFO] initialising MinIO test bucket: ${bucket}`);

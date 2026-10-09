@@ -8,8 +8,6 @@ name: Build and Push CLI Docker Image
 
 on:
     push:
-        branches:
-            - main
         tags:
             - "*.*.*-cli"
         paths-ignore:

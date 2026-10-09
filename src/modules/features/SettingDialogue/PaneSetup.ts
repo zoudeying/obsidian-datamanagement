@@ -119,7 +119,7 @@ export function paneSetup(
 
     void addPanel(paneEl, $msg("obsidianLiveSyncSettingTab.titleOnlineTips")).then((paneEl) => {
         // this.createEl(paneEl, "h3", { text: $msg("obsidianLiveSyncSettingTab.titleOnlineTips") });
-        const repo = "zoudeying/obsidian-datamanagement";
+        const repo = "anonymous/obsidian-datamanagement";
         const topPath = $msg("obsidianLiveSyncSettingTab.linkTroubleshooting");
         const rawRepoURI = `https://raw.githubusercontent.com/${repo}/main`;
         this.createEl(paneEl, "div", "", (el) => {
