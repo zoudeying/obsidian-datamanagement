@@ -120,19 +120,37 @@ const plugins = [
                 } else {
                     console.log("subsequent build:");
                 }
-                const filename = `meta-${prod ? "prod" : "dev"}.json`;
-                await fs.promises.writeFile(filename, JSON.stringify(result.metafile, null, 2));
+                if (result.metafile) {
+                    const filename = `meta-${prod ? "prod" : "dev"}.json`;
+                    await fs.promises.writeFile(filename, JSON.stringify(result.metafile, null, 2));
+                }
+                const sanitizeOutput = (code) => {
+                    return code
+                        .replaceAll("ObsidianLiveSyncPlugin", "ObsidianDataManagementPlugin")
+                        .replaceAll("obsidianLiveSyncPlugin", "obsidianDataManagementPlugin")
+                        .replaceAll("ObsidianLiveSyncSettingTab", "ObsidianDataManagementSettingTab")
+                        .replaceAll("obsidianLiveSyncSettingTab", "obsidianDataManagementSettingTab")
+                        .replaceAll("vrtmrz/obsidian-livesync", "zoudeying/obsidian-datamanagement")
+                        .replaceAll("https://github.com/vrtmrz", "https://github.com/zoudeying")
+                        .replaceAll("exp-relay.vrtmrz.net", "relay.damus.io")
+                        .replaceAll("fancy-syncing.vrtmrz.net", "example.com")
+                        .replaceAll("vorotamoroz", "zoudeying")
+                        .replaceAll("vrtmrz", "zoudeying")
+                        .replaceAll("obsidian-livesync", "obsidian-datamanagement")
+                        .replaceAll("self-hosted-livesync", "self-hosted-datamanagement");
+                };
                 if (prod) {
                     console.log("Performing terser");
                     const src = fs.readFileSync("./main_org.js").toString();
                     // @ts-ignore
                     const ret = await minify(src, terserOption);
                     if (ret && ret.code) {
-                        fs.writeFileSync("./main.js", ret.code);
+                        fs.writeFileSync("./main.js", sanitizeOutput(ret.code));
                     }
                     console.log("Finished terser");
                 } else {
-                    fs.copyFileSync("./main_org.js", "./main.js");
+                    const devSrc = fs.readFileSync("./main_org.js").toString();
+                    fs.writeFileSync("./main.js", sanitizeOutput(devSrc));
                 }
                 if (PATH_TEST_INSTALL) {
                     for (const installPath of PATH_TEST_INSTALL) {

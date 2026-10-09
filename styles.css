@@ -61,7 +61,7 @@
     display: block;
 }
 
-.syncstatusbar {
+.datamgmt-statusbar {
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
 }
@@ -379,7 +379,7 @@ span.ls-mark-cr::after {
 }
 
 
-.livesync-status {
+.datamgmt-status {
     user-select: none;
     pointer-events: none;
     height: auto;
@@ -401,35 +401,35 @@ span.ls-mark-cr::after {
     font-size: 80%;
 }
 
-div.workspace-leaf-content[data-type=bases]  .livesync-status {
+div.workspace-leaf-content[data-type=bases]  .datamgmt-status {
     top: calc(var(--bases-header-height) + var(--header-height));
     padding: 5px;
     padding-right: 18px;
 }
 
-.is-mobile div.workspace-leaf-content[data-type=bases]  .livesync-status {
+.is-mobile div.workspace-leaf-content[data-type=bases]  .datamgmt-status {
     top: calc(var(--bases-header-height) + var(--view-header-height));
     padding: 6px;
     padding-right: 18px;
 }
 
-.livesync-status div {
+.datamgmt-status div {
     opacity: 0.6;
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
 }
 
-.livesync-status .livesync-status-loghistory {
+.datamgmt-status .datamgmt-status-loghistory {
     text-align: left;
     opacity: 0.4;
 
 }
 
-.livesync-status div.livesync-status-messagearea:empty {
+.datamgmt-status div.datamgmt-status-messagearea:empty {
     display: none;
 }
 
-.livesync-status div.livesync-status-messagearea:not(:empty) {
+.datamgmt-status div.datamgmt-status-messagearea:not(:empty) {
     opacity: 0.6;
     color: var(--text-on-accent);
     border: 1px solid var(--background-modifier-error);

@@ -228,7 +228,7 @@ export class ModuleLog extends AbstractObsidianModule {
             const networkActivity = requestingStatLabel();
             const p2p = this.p2pLogCollector.p2pReplicationLine.value;
             return {
-                message: `${networkActivity}Sync: ${w} ↑ ${sent}${pushLast} ↓ ${arrived}${pullLast}${waiting}${queued}${p2p == "" ? "" : "\n" + p2p}`,
+                message: `${networkActivity}DM: ${w} ↑ ${sent}${pushLast} ↓ ${arrived}${pullLast}${waiting}${queued}${p2p == "" ? "" : "\n" + p2p}`,
             };
         });
 
@@ -467,23 +467,23 @@ ${stringifyYaml(info)}
             void this.setFileStatus();
         });
 
-        const w = compatGlobal.document.querySelectorAll(`.livesync-status`);
+        const w = compatGlobal.document.querySelectorAll(`.datamgmt-status`);
         w.forEach((e) => e.remove());
 
         this.observeForLogs();
 
         if (this.settings.showStatusOnEditor) {
-            this.statusDiv = this.app.workspace.containerEl.createDiv({ cls: "livesync-status" });
-            this.statusLine = this.statusDiv.createDiv({ cls: "livesync-status-statusline" });
-            this.messageArea = this.statusDiv.createDiv({ cls: "livesync-status-messagearea" });
-            this.logMessage = this.statusDiv.createDiv({ cls: "livesync-status-logmessage" });
-            this.logHistory = this.statusDiv.createDiv({ cls: "livesync-status-loghistory" });
+            this.statusDiv = this.app.workspace.containerEl.createDiv({ cls: "datamgmt-status" });
+            this.statusLine = this.statusDiv.createDiv({ cls: "datamgmt-status-statusline" });
+            this.messageArea = this.statusDiv.createDiv({ cls: "datamgmt-status-messagearea" });
+            this.logMessage = this.statusDiv.createDiv({ cls: "datamgmt-status-logmessage" });
+            this.logHistory = this.statusDiv.createDiv({ cls: "datamgmt-status-loghistory" });
             this.statusDiv.setCssStyles({ display: this.settings?.showStatusOnEditor ? "" : "none" });
         }
         eventHub.onEvent(EVENT_LAYOUT_READY, () => this.adjustStatusDivPosition());
         if (this.settings?.showStatusOnStatusbar) {
             this.statusBar = this.services.API.addStatusBarItem();
-            this.statusBar?.addClass("syncstatusbar");
+            this.statusBar?.addClass("datamgmt-statusbar");
         }
         this.adjustStatusDivPosition();
         this._log("Log module loaded", LOG_LEVEL_INFO);

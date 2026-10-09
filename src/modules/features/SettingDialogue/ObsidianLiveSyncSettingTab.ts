@@ -69,7 +69,7 @@ import { MinioStorageAdapter } from "@lib/replication/journal/objectstore/MinioS
 // For creating a document
 // const toc = new Set<string>();
 
-export class ObsidianLiveSyncSettingTab extends PluginSettingTab {
+export class ObsidianDataManagementSettingTab extends PluginSettingTab {
     plugin: ObsidianLiveSyncPlugin;
     private _lifetimeComponent: Component = new Component();
     get lifetimeComponent(): Component {
@@ -864,3 +864,4 @@ export class ObsidianLiveSyncSettingTab extends PluginSettingTab {
         await minioJournal.resetBucket();
     }
 }
+export type ObsidianLiveSyncSettingTab = ObsidianDataManagementSettingTab;

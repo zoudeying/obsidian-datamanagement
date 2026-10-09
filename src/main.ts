@@ -45,7 +45,7 @@ import { useP2PReplicatorCommands } from "@lib/replication/trystero/useP2PReplic
 import { useP2PReplicatorUI } from "./serviceFeatures/useP2PReplicatorUI.ts";
 import { createOpenReplicationUI, createOpenRebuildUI } from "./features/P2PSync/P2PReplicator/P2PReplicationUI.ts";
 export type LiveSyncCore = LiveSyncBaseCore<ObsidianServiceContext, LiveSyncCommands>;
-export default class ObsidianLiveSyncPlugin extends Plugin {
+export default class ObsidianDataManagementPlugin extends Plugin {
     core: LiveSyncCore;
 
     /**
@@ -216,3 +216,4 @@ export default class ObsidianLiveSyncPlugin extends Plugin {
         return void this.core.services.control.onUnload();
     }
 }
+export type ObsidianLiveSyncPlugin = ObsidianDataManagementPlugin;

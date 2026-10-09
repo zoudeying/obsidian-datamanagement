@@ -207,7 +207,7 @@
         spellcheck="false"
         bind:value={syncSetting.P2P_relays}
     />
-    <button class="button" onclick={() => setDefaultRelay()}>Use vrtmrz's relay</button>
+    <button class="button" onclick={() => setDefaultRelay()}>Use default relay</button>
 </InputRow>
 <InputRow label="Group ID">
     <input

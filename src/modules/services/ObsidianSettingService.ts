@@ -51,7 +51,7 @@ export class ObsidianSettingService<T extends ObsidianServiceContext> extends Se
                     this.isGloballyObfuscated = true;
                     return JSON.parse(decrypted);
                 } catch (ex) {
-                    console.error("Failed to decrypt obfuscated data.json");
+                    console.error("Failed to decrypt obfuscated data.json", ex);
                 }
             }
         }
@@ -63,7 +63,7 @@ export class ObsidianSettingService<T extends ObsidianServiceContext> extends Se
                 this.isGloballyObfuscated = false; // Mark for migration
                 return JSON.parse(decrypted);
             } catch (ex) {
-                console.error("Failed to decrypt legacy obfuscated data.json");
+                console.error("Failed to decrypt legacy obfuscated data.json", ex);
             }
         }
 

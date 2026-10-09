@@ -295,11 +295,11 @@
                             <label class={{ "is-dirty": isRelayModified }}>
                                 <input
                                     type="text"
-                                    placeholder="wss://exp-relay.vrtmrz.net, wss://xxxxx"
+                                    placeholder="wss://relay.damus.io, wss://xxxxx"
                                     bind:value={eRelay}
                                     autocomplete="off"
                                 />
-                                <button onclick={() => useDefaultRelay()}> Use vrtmrz's relay </button>
+                                <button onclick={() => useDefaultRelay()}> Use default relay </button>
                             </label>
                         </td>
                     </tr>

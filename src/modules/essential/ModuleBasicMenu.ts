@@ -24,14 +24,14 @@ export class ModuleBasicMenu extends AbstractModule {
         });
         this.addCommand({
             id: "livesync-toggle",
-            name: "Toggle LiveSync",
+            name: "Toggle live replication",
             callback: async () => {
                 if (this.settings.liveSync) {
                     this.settings.liveSync = false;
-                    this._log("LiveSync Disabled.", LOG_LEVEL_NOTICE);
+                    this._log("Data Management Disabled.", LOG_LEVEL_NOTICE);
                 } else {
                     this.settings.liveSync = true;
-                    this._log("LiveSync Enabled.", LOG_LEVEL_NOTICE);
+                    this._log("Data Management Enabled.", LOG_LEVEL_NOTICE);
                 }
                 await this.services.control.applySettings();
                 await this.services.setting.saveSettingData();
@@ -39,14 +39,14 @@ export class ModuleBasicMenu extends AbstractModule {
         });
         this.addCommand({
             id: "livesync-suspendall",
-            name: "Toggle All Sync.",
+            name: "Toggle All Operations",
             callback: async () => {
                 if (this.services.appLifecycle.isSuspended()) {
                     this.services.appLifecycle.setSuspended(false);
-                    this._log("Self-hosted LiveSync resumed", LOG_LEVEL_NOTICE);
+                    this._log("Data Management resumed", LOG_LEVEL_NOTICE);
                 } else {
                     this.services.appLifecycle.setSuspended(true);
-                    this._log("Self-hosted LiveSync suspended", LOG_LEVEL_NOTICE);
+                    this._log("Data Management suspended", LOG_LEVEL_NOTICE);
                 }
                 await this.services.control.applySettings();
                 await this.services.setting.saveSettingData();
